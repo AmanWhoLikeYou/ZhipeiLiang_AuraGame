@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "AuraCharacterBase.generated.h"
 
+class UAbilitySystemComponent;
 class UAttributeSet;
 class UAuraAbilitySystemComponent;
 
@@ -14,16 +15,16 @@ class AURA_API AAuraCharacterBase : public ACharacter
 
 public:
 	AAuraCharacterBase();
-
-protected:
 	virtual void BeginPlay() override;
+	
+protected:
 
 	UPROPERTY(EditAnywhere,Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 	
 protected:
 	UPROPERTY()
-	TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 	

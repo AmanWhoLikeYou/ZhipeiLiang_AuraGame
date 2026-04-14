@@ -16,6 +16,14 @@ AAuraEnemy::AAuraEnemy()
 	
 	AttributeSet = CreateDefaultSubobject<UAttributeSet>(TEXT("AttributeSet"));
 	
+	
+	
+}
+
+void AAuraEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 void AAuraEnemy::HightlightActor()
@@ -39,3 +47,4 @@ UAbilitySystemComponent* AAuraEnemy::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
+
