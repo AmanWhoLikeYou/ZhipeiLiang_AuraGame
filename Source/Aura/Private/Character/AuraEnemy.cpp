@@ -4,6 +4,7 @@
 #include "Character/AuraEnemy.h"
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 #include "Aura/Aura.h"
 
 AAuraEnemy::AAuraEnemy()
@@ -14,7 +15,7 @@ AAuraEnemy::AAuraEnemy()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
-	AttributeSet = CreateDefaultSubobject<UAttributeSet>(TEXT("AttributeSet"));
+	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>(TEXT("AttributeSet"));
 	
 	
 	
@@ -42,9 +43,3 @@ void AAuraEnemy::UnHightlightActor()
 	Weapon->SetRenderCustomDepth(false);
 	UE_LOG(LogTemp, Warning, TEXT("Unhighlighting Enemy: %s"), *GetName());
 }
-
-UAbilitySystemComponent* AAuraEnemy::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-
