@@ -49,7 +49,7 @@ private:
 	void Move(const FInputActionValue& InputValue);
     
 	// 上一帧检测到的敌人（用于取消高亮）
-	IEnemyInterface* LastEnemy;
+	TObjectPtr<IEnemyInterface> LastEnemy;
 	// 当前帧检测到的敌人（用于高亮）
-	IEnemyInterface* CurrentEnemy;
+	TObjectPtr<IEnemyInterface> CurrentEnemy;
 };
