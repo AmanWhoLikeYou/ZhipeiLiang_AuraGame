@@ -50,3 +50,8 @@ void AAuraEnemy::UnHightlightActor()
 	Weapon->SetRenderCustomDepth(false);
 	UE_LOG(LogTemp, Warning, TEXT("Unhighlighting Enemy: %s"), *GetName());
 }
+
+int32 AAuraEnemy::GetPlayerLevel() const
+{
+	return Level;
+}

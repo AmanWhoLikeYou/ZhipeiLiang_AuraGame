@@ -21,11 +21,16 @@ public:
 	
 	virtual void BeginPlay() override;
 	
+	// Enemy Interface
 	virtual void HightlightActor() override;
 	virtual void UnHightlightActor() override;
 
-	
+	//CombatInterface
+	virtual int32 GetPlayerLevel() const override;
 protected:
 	
 	virtual void InitAbilityActorInfo() override;
+	
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category="Character Class Default")
+	int32 Level = 1;
 };

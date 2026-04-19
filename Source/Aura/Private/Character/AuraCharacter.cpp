@@ -39,6 +39,16 @@ void AAuraCharacter::OnRep_PlayerState()
 	
 }
 
+int32 AAuraCharacter::GetPlayerLevel() const
+{
+	if (AAuraPlayerState* PS = GetPlayerState<AAuraPlayerState>())
+	{
+		return PS->GetPlayerLevel();
+	}
+	
+	return Super::GetPlayerLevel();
+}
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	Super::InitAbilityActorInfo();
@@ -57,4 +67,6 @@ void AAuraCharacter::InitAbilityActorInfo()
 			HUD->InitOverlay(PC, AuraPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+	
+	InitializeDefaultAttributes();
 }
