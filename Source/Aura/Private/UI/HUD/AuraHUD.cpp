@@ -18,8 +18,19 @@ UAuraWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetControl
 	return OverlayWidgetController;
 }
 
+UAuraWidgetController* AAuraHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAuraWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return AttributeMenuWidgetController;
+}
+
 void AAuraHUD::InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* ASC,
-	UAttributeSet* AttributeSet)
+                           UAttributeSet* AttributeSet)
 {
 	checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass is nullptr. Please assign it in the editor."));
 	checkf(OverlayWidgetControllerClass, TEXT("OverlayWidgetControllerClass is nullptr. Please assign it in the editor."));
