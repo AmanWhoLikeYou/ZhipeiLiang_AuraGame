@@ -4,6 +4,10 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UAuraAbilitySystemComponent;
+class UAbilitySystemComponent;
+struct FGameplayTag;
+class UAuraInputConfig;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -52,4 +56,16 @@ private:
 	IEnemyInterface* LastEnemy;
 	// 当前帧检测到的敌人（用于高亮）
 	IEnemyInterface* CurrentEnemy;
+	
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+	
+	UPROPERTY(EditDefaultsOnly,Category="Input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
+	
+	UPROPERTY()
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+	
+	UAuraAbilitySystemComponent* GetASC();
 };

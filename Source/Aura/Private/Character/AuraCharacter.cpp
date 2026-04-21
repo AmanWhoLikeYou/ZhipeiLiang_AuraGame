@@ -26,7 +26,10 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	
+	//服务端初始化ability系统
 	InitAbilityActorInfo();
+	//服务器添加初始能力
+	AddCharacterAbilities();
 	
 }
 
@@ -34,6 +37,7 @@ void AAuraCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 	
+	//客户端初始化ability系统
 	InitAbilityActorInfo();
 
 	
