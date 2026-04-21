@@ -2,9 +2,15 @@
 #include "Player/AuraPlayerController.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AuraGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SplineComponent.h"
 #include "Engine/Engine.h"
+#include "GameFramework/Character.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
@@ -14,6 +20,8 @@ AAuraPlayerController::AAuraPlayerController()
 {
 	// Make this controller replicate by default
 	bReplicates = true;
+	
+	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
 }
 
 // PlayerTick 说明：每帧检测鼠标下的 Actor，如果 Actor 实现了 IEnemyInterface 则进行高亮/取消高亮处理。
@@ -21,34 +29,9 @@ AAuraPlayerController::AAuraPlayerController()
 void AAuraPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-    
-	FHitResult CursorHitResult;
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHitResult);
-    
-	if (!CursorHitResult.bBlockingHit) return;
-    
-	AActor* HitActor = CursorHitResult.GetActor();
-    
-	LastEnemy = CurrentEnemy;
-	CurrentEnemy = Cast<IEnemyInterface>(HitActor);
-    
-	if (LastEnemy ==nullptr)
-	{
-		if (CurrentEnemy)
-		{
-			CurrentEnemy->HightlightActor();
-		}
-	}
-	else if (LastEnemy != CurrentEnemy)
-	{
-		LastEnemy->UnHightlightActor();
-        
-		if (CurrentEnemy)
-		{
-			CurrentEnemy->HightlightActor();
-		}
-	}
-    
+	CursorTrace();
+	
+	AutoRun();
 }
 
 // BeginPlay 说明：
@@ -92,6 +75,36 @@ void AAuraPlayerController::SetupInputComponent()
 	
 }
 
+void AAuraPlayerController::CursorTrace()
+{
+	FHitResult CursorHitResult;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHitResult);
+    
+	if (!CursorHitResult.bBlockingHit) return;
+    
+	AActor* HitActor = CursorHitResult.GetActor();
+    
+	LastEnemy = CurrentEnemy;
+	CurrentEnemy = Cast<IEnemyInterface>(HitActor);
+    
+	if (LastEnemy ==nullptr)
+	{
+		if (CurrentEnemy)
+		{
+			CurrentEnemy->HightlightActor();
+		}
+	}
+	else if (LastEnemy != CurrentEnemy)
+	{
+		LastEnemy->UnHightlightActor();
+        
+		if (CurrentEnemy)
+		{
+			CurrentEnemy->HightlightActor();
+		}
+	}
+}
+
 // Move 说明：读取 Enhanced Input 的二维向量（通常来自 WASD / 摇杆），
 // 将其转换为基于控制器朝向的世界方向，并向受控 Pawn 添加移动输入。
 // 这样玩家朝向摄像机方向移动而不是固定世界轴向。
@@ -116,19 +129,80 @@ void AAuraPlayerController::Move(const FInputActionValue& InputValue)
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString()));
+	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
+	{
+		bTargeting = CurrentEnemy == nullptr ? false : true;
+		bAutoRunning = false;
+	}
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	GetASC()->AbilityInputReleased(InputTag);
+	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC() == nullptr) return;
+		GetASC()->AbilityInputReleased(InputTag);
+		return;
+	}
+	if (bTargeting)
+	{
+		if (GetASC() == nullptr) return;
+		GetASC()->AbilityInputReleased(InputTag);
+	}
+	else
+	{
+		APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
+		{
+			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), ControlledPawn->GetActorLocation(), CachedDestination))
+			{
+				if (NavPath->IsValid())
+				{
+					SplineComponent->ClearSplinePoints();
+					for (const auto& PathPoint : NavPath->PathPoints)
+					{
+						SplineComponent->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World);
+						DrawDebugSphere(GetWorld(), PathPoint, 25.f, 12, FColor::Green, false, 2.f);
+					}
+					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+					bAutoRunning = true;
+				}
+			}
+		}
+		FollowTime = 0.f;
+	}
 }
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	GetASC()->AbilityInputHeld(InputTag);
+	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC() == nullptr) return;
+		GetASC()->AbilityInputReleased(InputTag);
+		return;
+	}
+	
+	if (bTargeting)
+	{
+		if (GetASC() == nullptr) return;
+		GetASC()->AbilityInputReleased(InputTag);
+	}
+	else
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+		
+		FHitResult HitResult;
+		if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+		{
+			CachedDestination = HitResult.ImpactPoint;
+		}
+		
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			const FVector Direction = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(Direction, 1.0f);
+		}
+	}
 }
 
 UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()
@@ -138,4 +212,30 @@ UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()
 		AuraAbilitySystemComponent = Cast<UAuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
 	return AuraAbilitySystemComponent;
+}
+
+void AAuraPlayerController::AutoRun()
+{
+	if (!bAutoRunning) return;
+	if (APawn* ControlledPawn = GetPawn())	
+	{
+		const FVector Direction = SplineComponent->FindDirectionClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction, 1.0f);
+		
+		ACharacter* ControlledCharacter = Cast<ACharacter>(ControlledPawn);
+		if (ControlledCharacter)
+		{
+			UCapsuleComponent* Capsule = ControlledCharacter->GetCapsuleComponent();
+			const float HalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+
+			const FVector FeetLocation =
+				ControlledCharacter->GetActorLocation() - FVector(0.f, 0.f, HalfHeight);
+			
+			const float DistanceToTarget = FVector::Dist(FeetLocation, CachedDestination);
+			if (DistanceToTarget <= AutoRunAcceptanceRadius)
+			{
+				bAutoRunning = false;
+			}
+		}
+	}
 }

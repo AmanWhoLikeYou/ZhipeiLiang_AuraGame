@@ -4,6 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class USplineComponent;
 class UAuraAbilitySystemComponent;
 class UAbilitySystemComponent;
 struct FGameplayTag;
@@ -41,6 +42,8 @@ protected:
 
 private:
 
+	void CursorTrace();
+	
 	// Enhanced Input 的 Mapping Context：用于在本地玩家子系统中注册输入映射
 	UPROPERTY(EditAnywhere,Category="Input")
 	TObjectPtr<UInputMappingContext> AuraContext;
@@ -57,6 +60,8 @@ private:
 	// 当前帧检测到的敌人（用于高亮）
 	IEnemyInterface* CurrentEnemy;
 	
+	
+	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
@@ -68,4 +73,20 @@ private:
 	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
 	
 	UAuraAbilitySystemComponent* GetASC();
+	
+	//鼠标移动功能
+	
+	void AutoRun();
+	
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USplineComponent> SplineComponent;
 };
