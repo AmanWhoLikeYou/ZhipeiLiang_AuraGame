@@ -49,7 +49,11 @@ void AAuraProjectile::Destroyed()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation(),FRotator::ZeroRotator);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HitNiagaraSystem, GetActorLocation());
-		FlyAudioComponent->Stop();
+		if (FlyAudioComponent)
+		{
+			FlyAudioComponent->Stop();
+		}
+	
 	}
 	Super::Destroyed();
 }
@@ -59,7 +63,10 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedDataAsset, 
 {
 	UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation(),FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HitNiagaraSystem, GetActorLocation());
-	FlyAudioComponent->Stop();
+	if (FlyAudioComponent)
+	{
+		FlyAudioComponent->Stop();
+	}
 	
 	if (HasAuthority())
 	{

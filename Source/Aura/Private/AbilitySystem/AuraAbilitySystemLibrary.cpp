@@ -3,6 +3,9 @@
 
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/AuraHUD.h"
@@ -43,4 +46,36 @@ UAttributeMenuAWidgetController* UAuraAbilitySystemLibrary::GetAttributeMenuWidg
 		}
 	}
 	return nullptr;
+}
+
+void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject,
+	ECharacterClass CharacterClass, UAbilitySystemComponent* ASC, float Level)
+{
+	AAuraGameModeBase* GameMod = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMod == nullptr)return;
+	
+	AActor* AvatarActor = ASC->GetAvatarActor();
+	
+	UCharacterClassInfo* CharacterClassInfo = GameMod->CharacterClassInfo;
+	FCharacterClassDefaultInfo ClassDefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	
+	FGameplayEffectContextHandle PrimaryAttributeContextHandle = ASC->MakeEffectContext();
+	PrimaryAttributeContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle PrimaryAttributeHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.PrimaryAttributesInitializer,
+		Level,PrimaryAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributeHandle.Data.Get());
+	
+		
+	FGameplayEffectContextHandle SecondaryAttributeContextHandle = ASC->MakeEffectContext();
+	SecondaryAttributeContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle SecondaryAttributeHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->SecondaryAttributesInitializer,
+		Level,SecondaryAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeHandle.Data.Get());
+	
+		
+	FGameplayEffectContextHandle VitalAttributeContextHandle = ASC->MakeEffectContext();
+	VitalAttributeContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle VitalAttributeHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->VitalAttributeInitializer,
+		Level, VitalAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributeHandle.Data.Get());
 }

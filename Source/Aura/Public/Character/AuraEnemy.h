@@ -9,6 +9,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AuraEnemy.generated.h"
 
+enum class ECharacterClass : uint8;
 class UWidgetComponent;
 /**
  * 
@@ -36,13 +37,20 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangeSignature OnMaxHealthChanged; 
 	
+
+	
 protected:
 	
 	virtual void InitAbilityActorInfo() override;
 	
 	
+	virtual void InitializeDefaultAttributes() const override;
+	
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category="Character Class Default")
 	int32 Level = 1;
+	
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category="Character Class Default")	
+	ECharacterClass CharacterClass;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
