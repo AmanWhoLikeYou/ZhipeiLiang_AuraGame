@@ -19,7 +19,7 @@ void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 			if (const UAuraGameplayAbility* AuraAbility = Cast<UAuraGameplayAbility>(AbilitySpec.Ability))
 			{
-				AbilitySpec.DynamicAbilityTags.AddTag(AuraAbility->StartupInputTag);
+				AbilitySpec.GetDynamicSpecSourceTags().AddTag(AuraAbility->StartupInputTag);
 				GiveAbility(AbilitySpec);
 			}
 		}
@@ -32,7 +32,7 @@ void UAuraAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)
 	
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		if (AbilitySpec.DynamicAbilityTags.HasTag(InputTag))
+		if (AbilitySpec.GetDynamicSpecSourceTags().HasTag(InputTag))
 		{
 			AbilitySpecInputPressed(AbilitySpec);
 			if (!AbilitySpec.IsActive())
@@ -49,15 +49,28 @@ void UAuraAbilitySystemComponent::AbilityInputReleased(const FGameplayTag& Input
 	
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		if (AbilitySpec.DynamicAbilityTags.HasTag(InputTag))
-		{
+		if (AbilitySpec.GetDynamicSpecSourceTags().HasTag(InputTag))
+		{ 
 			AbilitySpecInputReleased(AbilitySpec);
+		}
+		
+	}
+}
+
+void UAuraAbilitySystemComponent::AbilityInputPressed(const FGameplayTag& InputTag)
+{	if (!InputTag.IsValid()) return;
+	
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (AbilitySpec.GetDynamicSpecSourceTags().HasTag(InputTag))
+		{
+			AbilitySpecInputPressed(AbilitySpec);
 		}
 	}
 }
 
-void UAuraAbilitySystemComponent::HandleEffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
-                                                      const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveHandle)
+void UAuraAbilitySystemComponent::HandleEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
+                                                                     const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveHandle)
 {
 	FGameplayTagContainer EffectTagsAssetTagsContainer;
 	EffectSpec.GetAllAssetTags(EffectTagsAssetTagsContainer);

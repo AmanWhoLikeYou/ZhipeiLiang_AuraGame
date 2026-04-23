@@ -3,7 +3,7 @@
 
 #include "UI/Widget/AuraUserWidget.h"
 
-void UAuraUserWidget::SetWidgetController(UAuraWidgetController* NewWidgetController)
+void UAuraUserWidget::SetWidgetController(UObject* NewWidgetController)
 {
 	WidgetController = NewWidgetController;
 	AfterWidgetControllerSet();

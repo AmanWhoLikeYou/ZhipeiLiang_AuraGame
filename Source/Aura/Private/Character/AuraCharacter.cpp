@@ -3,6 +3,7 @@
 
 #include "Character/AuraCharacter.h"
 
+#include "MotionWarpingComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/AuraPlayerController.h"
@@ -52,6 +53,8 @@ int32 AAuraCharacter::GetPlayerLevel() const
 	
 	return Super::GetPlayerLevel();
 }
+
+
 
 void AAuraCharacter::InitAbilityActorInfo()
 {

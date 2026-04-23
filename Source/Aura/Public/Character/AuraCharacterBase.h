@@ -25,12 +25,17 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
+	virtual FVector GetCombatSocketLocation() const override;
+
 protected:
 
 	UPROPERTY(EditAnywhere,Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 	
-protected:
+	UPROPERTY(EditAnywhere,Category="Combat")
+	FName WeaponTipSocketName;
+	
+	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()

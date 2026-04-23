@@ -60,6 +60,7 @@ private:
 	// 当前帧检测到的敌人（用于高亮）
 	IEnemyInterface* CurrentEnemy;
 	
+	FHitResult CursorHitResult;
 	
 	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
@@ -89,4 +90,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USplineComponent> SplineComponent;
+	
+	//shift Action
+	UPROPERTY(EditAnywhere,Category="Input")
+	TObjectPtr<UInputAction> ShiftAction;
+	
+	void ShiftPressed() {bShiftKeyDown = true;};
+	void ShiftReleased(){bShiftKeyDown = false;};
+	bool bShiftKeyDown = false;
 };
