@@ -45,6 +45,10 @@ public:
 	UPROPERTY(EditDefaultsOnly,Category="Common Class Defalt")
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 	
+	UPROPERTY(EditDefaultsOnly,Category="Common Class Defalt|Damage")
+	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
+	
 	FCharacterClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass);
+	
 	
 };
