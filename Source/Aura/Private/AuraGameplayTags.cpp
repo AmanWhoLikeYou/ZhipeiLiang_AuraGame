@@ -38,4 +38,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	
 	//SetByCallerTag
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), TEXT("伤害，SetByCaller传入的伤害数值标签"));
+	
+	//角色状态标签(Effect Granted Tag)
+	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Effects.HitReact"), TEXT("被击反应，角色受到攻击时触发的状态标签"));
 }

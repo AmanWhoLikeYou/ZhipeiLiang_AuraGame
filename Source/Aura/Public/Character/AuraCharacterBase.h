@@ -27,6 +27,13 @@ public:
 	
 	virtual FVector GetCombatSocketLocation() const override;
 
+	virtual UAnimMontage* GetHitReactMontage_Implementation() const override;
+	
+	//处理死亡在服务端的逻辑
+	virtual void Die() override;
+	//处理死亡在服务端和客户端的逻辑
+	UFUNCTION(NetMulticast,Reliable)
+	virtual void MulticastHandleDeath();
 protected:
 
 	UPROPERTY(EditAnywhere,Category="Combat")
@@ -58,8 +65,25 @@ protected:
 	
 	void AddCharacterAbilities();
 	
+	//溶解效果
+	void Dissolve();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartCharacterDissolveTimeline(UMaterialInstanceDynamic* DynamicDissolveMaterialInstance);
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicDissolveMaterialInstance);
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> CharacterDissolveMaterialInstance;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	
 private:
 	
 	UPROPERTY(EditAnywhere,Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
+	UPROPERTY(EditAnywhere,Category="Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

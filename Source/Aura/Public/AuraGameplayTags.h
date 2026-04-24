@@ -43,6 +43,8 @@ public:
 	//SetByCallerTag
 	FGameplayTag Damage;
 	
+	//角色状态标签(Effect Granted Tag)
+	FGameplayTag Effects_HitReact;
 private:
 	static FAuraGameplayTags GameplayTags;
 };

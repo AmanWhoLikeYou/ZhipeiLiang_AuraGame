@@ -29,4 +29,9 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 	void SetMotionWarpingTargetLocation(const FVector& TargetLocation);
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	UAnimMontage* GetHitReactMontage() const;
+	
+	virtual void Die() = 0;
 };

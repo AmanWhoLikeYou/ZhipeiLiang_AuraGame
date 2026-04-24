@@ -56,6 +56,7 @@ int32 AAuraCharacter::GetPlayerLevel() const
 
 
 
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	Super::InitAbilityActorInfo();
