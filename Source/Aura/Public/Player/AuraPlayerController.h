@@ -4,6 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageTextComponet;
 class USplineComponent;
 class UAuraAbilitySystemComponent;
 class UAbilitySystemComponent;
@@ -30,6 +31,9 @@ public:
 	AAuraPlayerController();
 	
 	virtual void PlayerTick(float DeltaTime) override;
+	
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 
 protected:
 	// Called when the game starts or when spawned
@@ -98,4 +102,7 @@ private:
 	void ShiftPressed() {bShiftKeyDown = true;};
 	void ShiftReleased(){bShiftKeyDown = false;};
 	bool bShiftKeyDown = false;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponet> DamageTextComponentClass;
 };

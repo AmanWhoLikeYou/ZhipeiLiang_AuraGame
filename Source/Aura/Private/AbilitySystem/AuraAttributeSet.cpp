@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/AuraPlayerController.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -126,7 +127,7 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	{
 		AActor* SourceAvatarActor = SourceASC->AbilityActorInfo->AvatarActor.Get();
 		AController* SourceController = SourceASC->AbilityActorInfo->PlayerController.Get();
-		EffectProperties.TargetAvatarActor = SourceAvatarActor;
+		EffectProperties.SourceAvatarActor = SourceAvatarActor;
 		
 		if (SourceController == nullptr && SourceAvatarActor != nullptr)
 		{
@@ -149,6 +150,13 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	{
 		AActor* TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
 		AController* TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		if (TargetController == nullptr && TargetAvatarActor != nullptr)
+		{
+			if (const APawn* TargetPawn = Cast<APawn>(TargetAvatarActor))
+			{
+				TargetController = TargetPawn->GetController();
+			}
+		}
 		ACharacter* TargetCharacter = Cast<ACharacter>(TargetAvatarActor);
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetAvatarActor);
 		EffectProperties.TargetAvatarActor = TargetAvatarActor;
@@ -157,6 +165,8 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		EffectProperties.TargetASC = TargetASC;
 	}
 }
+
+
 
 void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
@@ -198,11 +208,30 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
 				EffectProperties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
+		
+			ShowFloatingDamageText(EffectProperties,LocalIncomingDamage);
 		}
 	}
 
 }
 
+void UAuraAttributeSet::ShowFloatingDamageText(FEffectProperties& EffectProperties, float DamageAmount) const
+{
+	if (!IsValid(EffectProperties.TargetCharacter)) return;
+
+	AAuraPlayerController* SourcePC = Cast<AAuraPlayerController>(EffectProperties.SourceController);
+	AAuraPlayerController* TargetPC = Cast<AAuraPlayerController>(EffectProperties.TargetController);
+
+	if (SourcePC)
+	{
+		SourcePC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter);
+	}
+
+	if (TargetPC && TargetPC != SourcePC)
+	{
+		TargetPC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter);
+	}
+}
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Health, OldHealth);
