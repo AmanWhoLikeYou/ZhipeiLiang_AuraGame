@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AuraGameplayTags.h"
 #include "GameplayEffectExtension.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -209,13 +210,15 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				EffectProperties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
 		
-			ShowFloatingDamageText(EffectProperties,LocalIncomingDamage);
+			bool bBlockedHit = UAuraAbilitySystemLibrary::IsBlockedHit(EffectProperties.EffectContextHandle);
+			bool bCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(EffectProperties.EffectContextHandle);
+			ShowFloatingDamageText(EffectProperties,LocalIncomingDamage,bBlockedHit,bCriticalHit);
 		}
 	}
 
 }
 
-void UAuraAttributeSet::ShowFloatingDamageText(FEffectProperties& EffectProperties, float DamageAmount) const
+void UAuraAttributeSet::ShowFloatingDamageText(FEffectProperties& EffectProperties, float DamageAmount, bool bBlockedHit, bool bCriticalHit) const
 {
 	if (!IsValid(EffectProperties.TargetCharacter)) return;
 
@@ -224,12 +227,12 @@ void UAuraAttributeSet::ShowFloatingDamageText(FEffectProperties& EffectProperti
 
 	if (SourcePC)
 	{
-		SourcePC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter);
+		SourcePC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter, bBlockedHit, bCriticalHit);
 	}
 
 	if (TargetPC && TargetPC != SourcePC)
 	{
-		TargetPC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter);
+		TargetPC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter, bBlockedHit, bCriticalHit);
 	}
 }
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)

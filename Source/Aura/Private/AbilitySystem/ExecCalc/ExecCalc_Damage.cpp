@@ -4,6 +4,7 @@
 #include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraAbilityTypes.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
@@ -56,6 +57,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
 	
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
+	
+	
 	
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
@@ -83,6 +87,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	{
 		Damage /= 2.f;
 	}
+	UAuraAbilitySystemLibrary::SetIsBlockedHit(Context, bBlocked);
+	
 	
 	//Armor Reduction
 	const UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatar);
@@ -95,6 +101,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	const float EffectiveArmor = TargetArmor * (100 - SourceArmorPenetration * ArmorPenetrationCoefficient) / 100.f;
 	Damage *= (100 - EffectiveArmor * EffectiveArmorCoefficient) / 100.f;
+	
 	
 	//Critical Hit
 	float CriticalHitChance = 0.f;
@@ -116,7 +123,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	{		
 		Damage = Damage * 2.f + CriticalHitDamage;
 	}
-	
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(Context, bCriticalHit);
 	
 	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(),EGameplayModOp::Additive,Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
