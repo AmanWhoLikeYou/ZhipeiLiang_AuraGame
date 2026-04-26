@@ -11,6 +11,8 @@ struct FGameplayEffectSpecHandle;
 class UNiagaraSystem;
 class USphereComponent;
 class UProjectileMovementComponent;
+class USoundBase;
+class UAudioComponent;
 
 UCLASS()
 class AURA_API AAuraProjectile : public AActor
@@ -26,17 +28,20 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
-	
-	
-	
+
 protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedDataAsset, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
 		bool bFromSweep, const FHitResult& SweepResult);
+
+	// Broadcast impact effects from server so clients can see/hear hit even on spawn-overlap cases.
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayHitEffects();
 	
 private:
+	void PlayHitEffects();
 	
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
