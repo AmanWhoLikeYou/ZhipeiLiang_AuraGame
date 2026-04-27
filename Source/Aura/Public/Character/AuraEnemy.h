@@ -9,6 +9,8 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AuraEnemy.generated.h"
 
+class UBehaviorTree;
+class AAuraAIController;
 enum class ECharacterClass : uint8;
 class UWidgetComponent;
 /**
@@ -21,6 +23,7 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase,public IEnemyInterface
 	
 public:
 	AAuraEnemy();
+	virtual void PossessedBy(AController* NewController) override;
 	
 	virtual void BeginPlay() override;
 	
@@ -66,5 +69,11 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
+	
+	UPROPERTY(EditAnywhere,Category= "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+	
+	UPROPERTY()
+	TObjectPtr<AAuraAIController> AuraAIController;
 	
 };

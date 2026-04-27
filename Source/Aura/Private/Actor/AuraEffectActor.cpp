@@ -30,6 +30,11 @@ void AAuraEffectActor::BeginPlay()
 void AAuraEffectActor::ApplyGameplayEffectToTarget(AActor* TargetActor,
 	TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
+	if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectsToEnemy)
+	{
+		return;
+	}
+	
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	if (TargetASC == nullptr)
 	{
@@ -47,10 +52,21 @@ void AAuraEffectActor::ApplyGameplayEffectToTarget(AActor* TargetActor,
 	{
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
+	
+	if (bDestroyOnEffectApplication && SpecHandle.Data.Get()->Def->DurationPolicy != EGameplayEffectDurationType::Infinite)
+	{
+		Destroy();
+	}
+	
 }
 
 void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectsToEnemy)
+	{
+		return;
+	}
+	
 	// 瞬时效果在 BeginOverlap 时应用（若有多个则循环应用）
 	if(InstantGameplayEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnBeginOverlap)
 	{
@@ -90,6 +106,11 @@ void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 
 void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectsToEnemy)
+	{
+		return;
+	}
+	
 	// 瞬时效果在 EndOverlap 时应用（若有多个则循环应用）
 	if (InstantGameplayEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
