@@ -35,10 +35,23 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-FVector AAuraCharacterBase::GetCombatSocketLocation() const
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) const
 {
-	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	if (const FName* SocketName = TagToAttackSocketNameMap.Find(MontageTag))
+	{
+		if (bUseWeapon)
+		{
+			check(Weapon);
+			return Weapon->GetSocketLocation(*SocketName);
+		}
+		else
+		{
+			check(GetMesh());
+			return GetMesh()->GetSocketLocation(*SocketName);
+
+		}
+	}
+	return FVector();
 }
 
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation() const
@@ -46,10 +59,24 @@ UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation() const
 	return HitReactMontage;
 }
 
+bool AAuraCharacterBase::IsDead_Implementation() const
+{
+	return bDead;
+}
+
+AActor* AAuraCharacterBase::GetAvatarActor_Implementation()
+{	return this;
+}
+
 void AAuraCharacterBase::Die()
 {
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath();
+}
+
+TArray<FTaggedMontage> AAuraCharacterBase::GetAttackMontages_Implementation() const
+{
+	return AttackMontages;
 }
 
 void AAuraCharacterBase::MulticastHandleDeath_Implementation()
@@ -66,6 +93,8 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	Dissolve();
+	
+	bDead = true;
 }
 
 

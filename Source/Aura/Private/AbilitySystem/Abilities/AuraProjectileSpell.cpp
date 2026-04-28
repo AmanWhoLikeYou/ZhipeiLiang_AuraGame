@@ -30,7 +30,8 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTagetLocatio
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (CombatInterface)
 	{
-		FVector SpawnLocation = CombatInterface->GetCombatSocketLocation();
+		FVector SpawnLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), 
+			FAuraGameplayTags::Get().Montage_Attack_Weapon);
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SpawnLocation);
 
@@ -52,7 +53,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTagetLocatio
 		EffectContextHandle.AddHitResult(HitResult);
 		
 		
-		const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(ProjectileDamageEffect, GetAbilityLevel(), EffectContextHandle);
+		const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 		
 		const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 		

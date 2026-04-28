@@ -7,7 +7,7 @@
 #include "EnemyInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI,BlueprintType)
 class UEnemyInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -24,4 +24,11 @@ class AURA_API IEnemyInterface
 public:
 	virtual void HightlightActor() = 0;
 	virtual void UnHightlightActor() = 0;
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	void SetCombatTarget(AActor* Target);
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	AActor* GetCombatTarget() const;
+	
 };

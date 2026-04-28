@@ -26,6 +26,6 @@ protected:
 	void SpawnProjectile(const FVector& ProjectileTagetLocation);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<AAuraProjectile> ProjectileClass;
+	TSubclassOf<AAuraProjectile> ProjectileClass; 
 	
 };

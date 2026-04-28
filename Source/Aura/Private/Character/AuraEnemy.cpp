@@ -56,7 +56,7 @@ void AAuraEnemy::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, GetAbilitySystemComponent());
+		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, GetAbilitySystemComponent(), CharacterClass);
 	}
 	
 	UAuraUserWidget* HealthBarWidget = Cast<UAuraUserWidget>(HealthBarWidgetComponent->GetUserWidgetObject());
@@ -95,6 +95,7 @@ void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCou
 	bHitReacting = NewCount > 0;
 	 
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	if (AuraAIController && AuraAIController->GetBlackboardComponent())
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 }
 
@@ -142,3 +143,15 @@ void AAuraEnemy::Die()
 	SetLifeSpan(LifeSpan);
 	Super::Die();
 }
+
+
+void AAuraEnemy::SetCombatTarget_Implementation(AActor* Target)
+{
+	CombatTarget = Target;
+}
+
+AActor* AAuraEnemy::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
+

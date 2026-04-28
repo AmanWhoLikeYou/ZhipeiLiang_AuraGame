@@ -6,6 +6,7 @@
 #include "AbilitySystem/Abilities/AuraGameplayAbility.h"
 #include "AuraDamageGameplayAbility.generated.h"
 
+struct FTaggedMontage;
 /**
  * 
  */
@@ -15,11 +16,15 @@ class AURA_API UAuraDamageGameplayAbility : public UAuraGameplayAbility
 	GENERATED_BODY()
 	
 public:
-
+	UFUNCTION(BlueprintCallable)
+	void CauseDamage(AActor* TargetActor);
+	
+	UFUNCTION(BlueprintPure)
+	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& Array) const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> ProjectileDamageEffect;
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 
 	UPROPERTY(EditDefaultsOnly,Category="Damage")

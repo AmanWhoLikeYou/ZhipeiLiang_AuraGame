@@ -25,22 +25,35 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
-	virtual FVector GetCombatSocketLocation() const override;
-
+	/*CombatInterface*/
+	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) const override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() const override;
-	
+	virtual bool IsDead_Implementation() const override;
+	virtual AActor* GetAvatarActor_Implementation() override;
 	//处理死亡在服务端的逻辑
 	virtual void Die() override;
 	//处理死亡在服务端和客户端的逻辑
 	UFUNCTION(NetMulticast,Reliable)
 	virtual void MulticastHandleDeath();
-protected:
-
-	UPROPERTY(EditAnywhere,Category="Combat")
-	TObjectPtr<USkeletalMeshComponent> Weapon;
+	
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() const override;
 	
 	UPROPERTY(EditAnywhere,Category="Combat")
-	FName WeaponTipSocketName;
+	TArray<FTaggedMontage> AttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Combat")
+	TMap<FGameplayTag,FName> TagToAttackSocketNameMap;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Combat")
+	bool bUseWeapon = true;
+	/*CombatInterface*/
+	
+protected:
+
+	bool bDead = false;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Combat")
+	TObjectPtr<USkeletalMeshComponent> Weapon;
 	
 	
 	UPROPERTY()

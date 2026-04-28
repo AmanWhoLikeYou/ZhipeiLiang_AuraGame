@@ -60,6 +60,13 @@ public:
 	//角色状态标签(Effect Granted Tag)
 	FGameplayTag Effects_HitReact;
 	
+	//攻击标签
+	FGameplayTag Abilities_Attack;
+	
+	//蒙太奇和武器种类联动标签
+	FGameplayTag Montage_Attack_Weapon;
+	FGameplayTag Montage_Attack_RightHand;
+	FGameplayTag Montage_Attack_LeftHand;
 	
 private:
 	static FAuraGameplayTags GameplayTags;

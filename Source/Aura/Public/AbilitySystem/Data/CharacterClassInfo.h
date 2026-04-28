@@ -24,6 +24,9 @@ struct FCharacterClassDefaultInfo
 	
 	UPROPERTY(EditDefaultsOnly,Category="Class Defalt")
 	TSubclassOf<UGameplayEffect> PrimaryAttributesInitializer;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Class Defalt")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };
 /**
  * 
