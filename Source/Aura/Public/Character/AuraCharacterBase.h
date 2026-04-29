@@ -6,6 +6,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UGameplayAbility;
 class UAuraGameplayAbility;
 class UGameplayEffect;
@@ -90,6 +91,9 @@ protected:
 	TObjectPtr<UMaterialInstance> CharacterDissolveMaterialInstance;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UNiagaraSystem> BloodEffect;
 
 	
 private:
