@@ -5,6 +5,7 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -79,8 +80,27 @@ TArray<FTaggedMontage> AAuraCharacterBase::GetAttackMontages_Implementation() co
 	return AttackMontages;
 }
 
+UNiagaraSystem* AAuraCharacterBase::GetBloodEffectNiagara_Implementation() const
+{
+	return BloodEffectNiagara;
+}
+
+FTaggedMontage AAuraCharacterBase::GetTagsMontageByMontageTag_Implementation(const FGameplayTag& MontageTag) const
+{
+	for (const FTaggedMontage& TaggedMontage : AttackMontages)
+	{
+		if (TaggedMontage.MontageTag == MontageTag)
+		{
+			return TaggedMontage;
+		}
+	}
+	return FTaggedMontage();
+}
+
 void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 {
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+	
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
@@ -134,7 +154,7 @@ void AAuraCharacterBase::AddCharacterAbilities()
 void AAuraCharacterBase::Dissolve()
 {
 	if (IsValid(CharacterDissolveMaterialInstance))
-	{
+	{ 
 		UMaterialInstanceDynamic* RealDissolveMaterialInstance = UMaterialInstanceDynamic::Create(CharacterDissolveMaterialInstance, this);
 		GetMesh()->SetMaterial(0, RealDissolveMaterialInstance);
 		StartCharacterDissolveTimeline(RealDissolveMaterialInstance);
@@ -145,4 +165,14 @@ void AAuraCharacterBase::Dissolve()
 		Weapon->SetMaterial(0, RealWeaponDissolveMaterialInstance);
 		StartWeaponDissolveTimeline(RealWeaponDissolveMaterialInstance);
 	}
+}
+
+int32 AAuraCharacterBase::GetMinionCount_Implementation() const
+{
+	return MinionCount;
+}
+
+void AAuraCharacterBase::IncrementMinionCount_Implementation(const int32 Amount)
+{
+	MinionCount += Amount;
 }

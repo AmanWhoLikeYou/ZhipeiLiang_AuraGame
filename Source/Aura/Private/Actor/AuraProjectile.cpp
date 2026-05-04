@@ -86,7 +86,8 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedDataAsset, 
 	{
 		return;
 	}
-	if (!UAuraAbilitySystemLibrary::IsNotFriendly(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+	if (!UAuraAbilitySystemLibrary::IsNotFriendly(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor)
+		&& !OtherActor->ActorHasTag("BlockingMesh"))
 	{
 		return;
 	}

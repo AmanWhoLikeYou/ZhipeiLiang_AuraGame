@@ -79,7 +79,7 @@ void AAuraEnemy::BeginPlay()
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
 		}
 	);
-		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::AnyCountChange).AddUObject(
 			this, &AAuraEnemy::HitReactTagChanged
 		);
 		

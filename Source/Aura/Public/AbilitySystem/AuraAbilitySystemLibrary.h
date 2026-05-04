@@ -51,4 +51,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriendly(const AActor* ActorA, const AActor* ActorB);
+	
+	
 };

@@ -39,6 +39,10 @@ public:
 	
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() const override;
 	
+	virtual UNiagaraSystem* GetBloodEffectNiagara_Implementation() const override;
+	
+	virtual FTaggedMontage GetTagsMontageByMontageTag_Implementation(const FGameplayTag& MontageTag ) const override;
+	
 	UPROPERTY(EditAnywhere,Category="Combat")
 	TArray<FTaggedMontage> AttackMontages;
 	
@@ -47,6 +51,13 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly,Category="Combat")
 	bool bUseWeapon = true;
+	
+	//Minions
+	int32 MinionCount = 0;
+	
+	virtual int32 GetMinionCount_Implementation() const override;
+	virtual void IncrementMinionCount_Implementation(const int32 Amount) override;
+	
 	/*CombatInterface*/
 	
 protected:
@@ -92,8 +103,12 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-	TObjectPtr<UNiagaraSystem> BloodEffect;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category="Combat")
+	TObjectPtr<UNiagaraSystem> BloodEffectNiagara;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category="Combat")
+	TObjectPtr<USoundBase> DeathSound;
+	
 
 	
 private:

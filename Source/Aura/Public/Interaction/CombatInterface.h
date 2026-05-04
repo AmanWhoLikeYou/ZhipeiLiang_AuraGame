@@ -20,6 +20,11 @@ struct FTaggedMontage
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	FGameplayTag MontageTag;
 	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	FGameplayTag SocketTag;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	USoundBase* ImpactSound = nullptr;
 };
 
 // This class does not need to be modified.
@@ -62,5 +67,14 @@ public:
 	TArray<FTaggedMontage> GetAttackMontages() const;
 	
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
-	UNiagaraSystem* GetBloodEffect()
+	UNiagaraSystem* GetBloodEffectNiagara() const;
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	FTaggedMontage GetTagsMontageByMontageTag(const FGameplayTag& MontageTag) const;
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	int32 GetMinionCount() const;
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	void IncrementMinionCount(const int32 Amount);
 };
