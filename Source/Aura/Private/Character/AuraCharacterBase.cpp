@@ -69,6 +69,12 @@ AActor* AAuraCharacterBase::GetAvatarActor_Implementation()
 {	return this;
 }
 
+ECharacterClass AAuraCharacterBase::GetCharacterClass_Implementation() const
+{
+	return CharacterClass;
+}
+
+
 void AAuraCharacterBase::Die()
 {
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
@@ -134,7 +140,7 @@ void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectCl
 	check(EffectClass);
 	check(IsValid(GetAbilitySystemComponent()));
 	FGameplayEffectContextHandle EffectContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-	EffectContextHandle.AddSourceObject(this);
+	EffectContextHandle.AddSourceObject(this);  
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(EffectClass, Level, EffectContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
@@ -149,6 +155,8 @@ void AAuraCharacterBase::AddCharacterAbilities()
 	UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(GetAbilitySystemComponent());
 	
 	AuraASC->AddCharacterAbilities(StartupAbilities);
+	AuraASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
+	
 }
 
 void AAuraCharacterBase::Dissolve()

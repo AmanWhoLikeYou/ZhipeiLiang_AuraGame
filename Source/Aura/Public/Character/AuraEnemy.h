@@ -32,7 +32,7 @@ public:
 	virtual void UnHightlightActor() override;
 
 	//CombatInterface
-	virtual int32 GetPlayerLevel() const override;
+	virtual int32 GetPlayerLevel_Implementation() const override;
 	virtual void Die() override;
 	virtual void SetCombatTarget_Implementation(AActor* Target) override;
 	virtual AActor* GetCombatTarget_Implementation() const override;
@@ -69,8 +69,6 @@ protected:
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category="Character Class Default")
 	int32 Level = 1;
 	
-	UPROPERTY(EditAnywhere,blueprintReadOnly,Category="Character Class Default")	
-	ECharacterClass CharacterClass;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;

@@ -133,7 +133,7 @@ void AAuraEnemy::UnHightlightActor()
 	UE_LOG(LogTemp, Warning, TEXT("Unhighlighting Enemy: %s"), *GetName());
 }
 
-int32 AAuraEnemy::GetPlayerLevel() const
+int32 AAuraEnemy::GetPlayerLevel_Implementation() const
 {
 	return Level;
 }

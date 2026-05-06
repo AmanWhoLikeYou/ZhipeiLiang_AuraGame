@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
+enum class ECharacterClass : uint8;
 class UNiagaraSystem;
 
 USTRUCT(BlueprintType)
@@ -43,8 +44,8 @@ class AURA_API ICombatInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	
-	virtual int32 GetPlayerLevel() const;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetPlayerLevel() const;
 	
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag) const;
@@ -77,4 +78,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	void IncrementMinionCount(const int32 Amount);
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	ECharacterClass GetCharacterClass() const;
 };

@@ -31,6 +31,9 @@ public:
 	virtual UAnimMontage* GetHitReactMontage_Implementation() const override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
+	
+	virtual ECharacterClass GetCharacterClass_Implementation() const override;
+	
 	//处理死亡在服务端的逻辑
 	virtual void Die() override;
 	//处理死亡在服务端和客户端的逻辑
@@ -82,6 +85,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly,EditAnywhere,Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributesEffect;
 	
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category="Character Class Default")	
+	ECharacterClass CharacterClass;
+	
 	virtual void InitAbilityActorInfo();
 	
 	virtual void InitializeDefaultAttributes() const;
@@ -115,6 +121,10 @@ private:
 	
 	UPROPERTY(EditAnywhere,Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
+	UPROPERTY(EditAnywhere,Category="Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
+
 	
 	UPROPERTY(EditAnywhere,Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;

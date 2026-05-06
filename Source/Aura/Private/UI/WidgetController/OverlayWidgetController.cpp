@@ -6,6 +6,8 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
+#include "Player/AuraPlayerState.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -78,6 +80,12 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		});
 	}
 	
+	AAuraPlayerState* AuraPS = CastChecked<AAuraPlayerState>(PlayerState);
+	AuraPS->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+	AuraPS->OnLevelChangedDelegate.AddLambda([this](int32 NewLevel)
+	{
+		OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+	});
 }
 
 void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraASC) const
@@ -97,3 +105,28 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemCo
     AuraASC->ForEachAbility(ForEachAbilityDelegate);
 }
 
+void UOverlayWidgetController::OnXPChanged(const int32 NewXP) const
+{
+	AAuraPlayerState* AuraPS = CastChecked<AAuraPlayerState>(PlayerState);
+	const ULevelUpInfo* LevelUpInfo = AuraPS->LevelUpInfo;
+	checkf(LevelUpInfo, TEXT("LevelUpInfo is not set in AuraPlayerState"));
+
+	const int32 Level = LevelUpInfo->FindLevelFromXP(NewXP);
+	float XPBarPercent = 0.f;
+	if (LevelUpInfo->LevelUpInfos.IsValidIndex(Level))
+	{
+		const int32 LastLevelXPRequirement = LevelUpInfo->LevelUpInfos[Level - 1].LevelUpRequirementXP;
+		const int32 NextLevelXPRequirement = LevelUpInfo->LevelUpInfos[Level].LevelUpRequirementXP;
+		
+		const int32 LevelXPSection = NextLevelXPRequirement - LastLevelXPRequirement;
+		const int32 CurrentLevelXPProgress = NewXP - LastLevelXPRequirement;
+		
+		XPBarPercent = LevelXPSection > 0 ? static_cast<float>(CurrentLevelXPProgress) / LevelXPSection : 0.f;
+		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
+	}
+	else
+	{
+		XPBarPercent = 1.f;
+		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
+	}
+}

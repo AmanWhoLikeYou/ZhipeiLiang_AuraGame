@@ -7,8 +7,10 @@
 #include "AuraGameplayTags.h"
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Aura/AuraLogChannels.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
 
@@ -217,6 +219,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				{
 					CombatInterface->Die();
 				}
+				SendXPEvent(EffectProperties);
 			}
 			else
 			{
@@ -231,6 +234,44 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 		}
 	}
 
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		const float LocalIncomingXP = GetIncomingXP();
+		SetIncomingXP(0.f);
+		
+		//SourceCharacter is Aura
+		if (EffectProperties.SourceCharacter->Implements<UPlayerInterface>() && EffectProperties.SourceCharacter->Implements<UCombatInterface>())
+		{
+			int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(EffectProperties.SourceCharacter);
+			int32 CurrentXP = IPlayerInterface::Execute_GetXP(EffectProperties.SourceCharacter);
+			
+			int32 NextLevel = IPlayerInterface::Execute_GetLevelFromXP(EffectProperties.SourceCharacter, CurrentXP + LocalIncomingXP);
+			int32 LevelUpNum = NextLevel - CurrentLevel;
+			
+			if (LevelUpNum > 0)
+			{
+				int32 AttributePointReward = 0;
+				int32 SpellPointReward = 0;
+				for (int Level = CurrentLevel; Level < NextLevel; Level++)
+				{
+					AttributePointReward += IPlayerInterface::Execute_GetAttributePointReward(EffectProperties.SourceCharacter, Level);
+					SpellPointReward += IPlayerInterface::Execute_GetSpellPointReward(EffectProperties.SourceCharacter, Level);
+				}
+				IPlayerInterface::Execute_AddToAttributePoints(EffectProperties.SourceCharacter, AttributePointReward);
+				IPlayerInterface::Execute_AddToSpellPoints(EffectProperties.SourceCharacter, SpellPointReward);
+				IPlayerInterface::Execute_AddToPlayerLevel(EffectProperties.SourceCharacter, LevelUpNum);
+				
+				SetHealth(GetMaxHealth());
+				SetMana(GetMaxMana());
+				
+				IPlayerInterface::Execute_LevelUp(EffectProperties.SourceCharacter);
+				
+			}
+			
+			IPlayerInterface::Execute_AddXP(EffectProperties.SourceCharacter, LocalIncomingXP);
+		}
+	}
+	
 }
 
 void UAuraAttributeSet::ShowFloatingDamageText(FEffectProperties& EffectProperties, float DamageAmount, bool bBlockedHit, bool bCriticalHit) const
@@ -250,6 +291,24 @@ void UAuraAttributeSet::ShowFloatingDamageText(FEffectProperties& EffectProperti
 		TargetPC->ShowDamageNumber(DamageAmount, EffectProperties.TargetCharacter, bBlockedHit, bCriticalHit);
 	}
 }
+
+void UAuraAttributeSet::SendXPEvent(const FEffectProperties& EffectProperties) const
+{
+	if (EffectProperties.TargetCharacter->Implements<UCombatInterface>())
+	{
+		const int32 TargetLevel = ICombatInterface::Execute_GetPlayerLevel(EffectProperties.TargetCharacter);
+		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(EffectProperties.TargetCharacter);
+		int32 XPReward = UAuraAbilitySystemLibrary::GetXPRewardByClassAndLevel(EffectProperties.TargetCharacter, TargetClass, TargetLevel);
+		
+		const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+		FGameplayEventData EventData;
+		EventData.EventTag = GameplayTags.Attributes_Meta_IncomingXP; 
+		EventData.EventMagnitude = XPReward;
+		
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EffectProperties.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, EventData);
+	}
+}
+
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Health, OldHealth);
