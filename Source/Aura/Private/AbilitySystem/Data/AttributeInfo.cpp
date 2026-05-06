@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/Data/AttributeInfo.h"
 
+#include "Aura/AuraLogChannels.h"
+
 FAuraAttributeInfo UAttributeInfo::FindAttributeInfoFromTag(const FGameplayTag& AttributeTag, float bLogNotfound) const
 {
 	for (const FAuraAttributeInfo& AttributeInfo : AttributeInformation)
@@ -15,7 +17,7 @@ FAuraAttributeInfo UAttributeInfo::FindAttributeInfoFromTag(const FGameplayTag& 
 	
 	if (bLogNotfound)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Attribute with tag %s not found in AttributeInfo data asset."), *AttributeTag.ToString());
+		UE_LOG(LogAura, Warning, TEXT("Attribute with tag %s not found in AttributeInfo data asset."), *AttributeTag.ToString());
 	}
 	
 	return FAuraAttributeInfo();

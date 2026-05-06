@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -49,9 +50,22 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		OnMaxManaChanged.Broadcast(Data.NewValue);
 	});
 	
-	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectAppliedDelegate.AddLambda(
-		[this](const FGameplayTagContainer& EffectTagsAssetTagsContainer)
+	
+	if (UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent))
 	{
+		if (AuraASC->bStartupAbilitiesGiven)
+		{
+			OnInitializeStartupAbilities(AuraASC);
+		}
+		else
+		{
+			AuraASC->OnAbilityGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartupAbilities);
+
+		}
+		
+		AuraASC->OnEffectAppliedDelegate.AddLambda(
+		[this](const FGameplayTagContainer& EffectTagsAssetTagsContainer)
+		{
 		for (const FGameplayTag& Tag : EffectTagsAssetTagsContainer)
 		{
 			FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
@@ -61,6 +75,25 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				MessageWidgetRowDelegate.Broadcast(FoundRow ? *FoundRow : FUIWidgetRow());
 			}
 		}
+		});
+	}
+	
+}
+
+void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraASC) const
+{
+	if (!AuraASC->bStartupAbilitiesGiven) return;
+	
+	FForEachAbility ForEachAbilityDelegate;
+	ForEachAbilityDelegate.BindLambda([this,AuraASC](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		FAuraAbilityInfo AbilityInfo = AbilityInfoDataAsset->FindAbilityInfoFromTag(AuraASC->GetAbilityTagFromAbilitySpec(AbilitySpec));
+		
+		AbilityInfo.InputTag = AuraASC->GetInputTagFromAbilitySpec(AbilitySpec);
+		
+		AbilityInfoDelegate.Broadcast(AbilityInfo);
 	});
+	
+    AuraASC->ForEachAbility(ForEachAbilityDelegate);
 }
 

@@ -61,8 +61,12 @@ public:
 	FGameplayTag Effects_HitReact;
 	
 	//能力资产标签
+	//Enemy
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
+	//Aura
+	FGameplayTag Abilities_Fire_FireBolt;
+	
 
 	
 	//标记武器插槽标签
@@ -76,6 +80,9 @@ public:
 	FGameplayTag Montage_Attack_2;
 	FGameplayTag Montage_Attack_3;
 	FGameplayTag Montage_Attack_4;
+
+	//Cooldown标签
+	FGameplayTag Cooldown_Fire_FireBolt;
 	
 private:
 	static FAuraGameplayTags GameplayTags;
