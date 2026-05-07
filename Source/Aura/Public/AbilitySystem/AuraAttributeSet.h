@@ -235,6 +235,10 @@ private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties) const;
 	void ShowFloatingDamageText(FEffectProperties& EffectProperties, float DamageAmount, bool bBlockedHit, bool bCriticalHit) const;
 	void SendXPEvent(const FEffectProperties& EffectProperties) const;
+	void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+	
+	bool bTopOffHealth = false;
+	bool bTopOffMana = false;
 };
 
 

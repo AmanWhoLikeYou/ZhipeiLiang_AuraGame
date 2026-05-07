@@ -261,8 +261,8 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				IPlayerInterface::Execute_AddToSpellPoints(EffectProperties.SourceCharacter, SpellPointReward);
 				IPlayerInterface::Execute_AddToPlayerLevel(EffectProperties.SourceCharacter, LevelUpNum);
 				
-				SetHealth(GetMaxHealth());
-				SetMana(GetMaxMana());
+				bTopOffHealth = true;
+				bTopOffMana = true;
 				
 				IPlayerInterface::Execute_LevelUp(EffectProperties.SourceCharacter);
 				
@@ -306,6 +306,28 @@ void UAuraAttributeSet::SendXPEvent(const FEffectProperties& EffectProperties) c
 		EventData.EventMagnitude = XPReward;
 		
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EffectProperties.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, EventData);
+	}
+}
+
+void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		if (bTopOffHealth)
+		{
+			SetHealth(GetMaxHealth());
+			bTopOffHealth = false;
+		}
+	}
+	if (Attribute == GetMaxManaAttribute())
+	{
+		if (bTopOffMana)
+		{
+			SetMana(GetMaxMana());
+			bTopOffMana = false;
+		}
 	}
 }
 

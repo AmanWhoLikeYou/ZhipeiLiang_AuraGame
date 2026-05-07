@@ -12,6 +12,7 @@ class UAttributeInfo;
 struct FAuraAttributeInfo;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeInfocChangedSignature, const FAuraAttributeInfo&, AttributeInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterStatChangedSignature, int32, NewStatValue);
 /**
  * 
  */
@@ -27,6 +28,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnAttributeInfocChangedSignature OnAttributeInfoChangedDelegate;
 	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnCharacterStatChangedSignature OnAttributePointsChangedDelegate;
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnCharacterStatChangedSignature OnSpellPointsChangedDelegate;
+	
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAttributeInfo> DA_AttributeInfo;
