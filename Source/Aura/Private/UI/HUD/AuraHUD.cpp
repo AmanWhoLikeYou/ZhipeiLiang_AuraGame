@@ -29,6 +29,17 @@ UAuraWidgetController* AAuraHUD::GetAttributeMenuWidgetController(const FWidgetC
 	return AttributeMenuWidgetController;
 }
 
+UAuraWidgetController* AAuraHUD::GetSpellMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (SpellMenuWidgetController == nullptr)
+	{
+		SpellMenuWidgetController = NewObject<UAuraWidgetController>(this, SpellMenuWidgetControllerClass);
+		SpellMenuWidgetController->SetWidgetControllerParams(WCParams);
+		SpellMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return SpellMenuWidgetController;
+}
+
 void AAuraHUD::InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* ASC,
                            UAttributeSet* AttributeSet)
 {

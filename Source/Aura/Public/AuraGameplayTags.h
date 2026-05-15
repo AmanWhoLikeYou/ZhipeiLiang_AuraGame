@@ -49,6 +49,8 @@ public:
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
+	FGameplayTag InputTag_Passive_1;
+	FGameplayTag InputTag_Passive_2;
 	
 	//SetByCallerTag
 	FGameplayTag Damage;
@@ -64,12 +66,29 @@ public:
 	//角色状态标签(Effect Granted Tag)
 	FGameplayTag Effects_HitReact;
 	
-	//能力资产标签
+	//能力标签
+	//SpellGlobeTag(AssetTag Or None)
+	FGameplayTag Abilities_None;
+	
 	//Enemy
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
-	//Aura
+	
+	FGameplayTag Abilities_HitReact;//被击反应能力标签
+	//Aura能力资产标签
 	FGameplayTag Abilities_Fire_FireBolt;
+	FGameplayTag Abilities_Lightning_Electrocute;
+	
+	//能力状态标签，标记Aura对能力的使用情况
+	FGameplayTag Abilities_Status_Locked;
+	FGameplayTag Abilities_Status_Eligible;
+	FGameplayTag Abilities_Status_Unlocked;
+	FGameplayTag Abilities_Status_Equipped;
+	//标记能力是主动还是被动还是辅助能力
+	FGameplayTag Abilities_Type_Offensive;
+	FGameplayTag Abilities_Type_Passive;
+	FGameplayTag Abilities_Type_None;
+	
 	
 
 	

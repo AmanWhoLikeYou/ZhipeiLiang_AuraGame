@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "AuraHUD.generated.h"
 
+class USpellMenuWidgetController;
 class UAttributeSet;
 class UAbilitySystemComponent;
 struct FWidgetControllerParams;
@@ -21,8 +22,10 @@ class AURA_API AAuraHUD : public AHUD
 public:
 
 	UAuraWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
-	
 	UAuraWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
+	UAuraWidgetController* GetSpellMenuWidgetController(const FWidgetControllerParams& WCParams);
+
+	
 	
 	void InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* ASC, UAttributeSet* AttributeSet);
 	
@@ -51,4 +54,11 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAuraWidgetController> AttributeMenuWidgetController;
+	
+	//SpellMenuController
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UAuraWidgetController> SpellMenuWidgetControllerClass;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAuraWidgetController> SpellMenuWidgetController;
 };

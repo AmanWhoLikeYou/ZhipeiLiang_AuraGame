@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AuraGameplayTags.h"
 #include "Interaction/CombatInterface.h"
 
 void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
@@ -28,4 +29,10 @@ FTaggedMontage UAuraDamageGameplayAbility::GetRandomTaggedMontageFromArray(const
 	}
 	int32 RandomIndex = FMath::RandRange(0, Length - 1);
 	return Array[RandomIndex];
+}
+
+float UAuraDamageGameplayAbility::GetDamageByDamageType(int32 InLevel, const FGameplayTag& DamageType) const
+{
+	checkf(DamageTypes.Contains(DamageType), TEXT("DamageType: %s is not found in DamageTypes map, please check if the DamageType is added to the map and the tag is correct"), *DamageType.ToString());
+	return DamageTypes[DamageType].GetValueAtLevel(InLevel);
 }

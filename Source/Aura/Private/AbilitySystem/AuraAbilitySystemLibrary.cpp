@@ -16,44 +16,71 @@
 #include "UI/WidgetController/AttributeMenuAWidgetController.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "UI/WidgetController/SpellMenuWidgetController.h"
 
 UOverlayWidgetController* UAuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
+	FWidgetControllerParams WCParams;
+	AAuraHUD* HUD = nullptr;
+
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams,HUD))
+	{
+		return Cast<UOverlayWidgetController>(HUD->GetOverlayWidgetController(WCParams));
+	}
+	return nullptr;
+	
+}
+
+bool UAuraAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AAuraHUD*& OutHUD)
+{
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
-		if (AAuraHUD* HUD = Cast<AAuraHUD>(PC->GetHUD()))
+		OutHUD = Cast<AAuraHUD>(PC->GetHUD());
+		if (OutHUD)
 		{
 			AAuraPlayerState* PS = PC->GetPlayerState<AAuraPlayerState>();
 			UAbilitySystemComponent* ASC = PS ? PS->GetAbilitySystemComponent() : nullptr;
 			UAttributeSet* AS = PS ? PS->GetAttributeSet() : nullptr;
-			FWidgetControllerParams WCParams(PC, PS, ASC, AS);
+			OutWCParams.AttributeSet = AS;
+			OutWCParams.PlayerController = PC;
+			OutWCParams.PlayerState = PS;
+			OutWCParams.AbilitySystemComponent = ASC;
+			return true;
 			
-			return Cast<UOverlayWidgetController>(HUD->GetOverlayWidgetController(WCParams));
 		}
 	}
-	return nullptr;
+	return false;
 }
 
 UAttributeMenuAWidgetController* UAuraAbilitySystemLibrary::GetAttributeMenuWidgetController(
 	const UObject* WorldContextObject)
 {
-	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	FWidgetControllerParams WCParams;
+	AAuraHUD* HUD = nullptr;
+
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams,HUD))
 	{
-		if (AAuraHUD* HUD = Cast<AAuraHUD>(PC->GetHUD()))
-		{
-			AAuraPlayerState* PS = PC->GetPlayerState<AAuraPlayerState>();
-			UAbilitySystemComponent* ASC = PS ? PS->GetAbilitySystemComponent() : nullptr;
-			UAttributeSet* AS = PS ? PS->GetAttributeSet() : nullptr;
-			FWidgetControllerParams WCParams(PC, PS, ASC, AS);
-			
-			return Cast<UAttributeMenuAWidgetController>(HUD->GetAttributeMenuWidgetController(WCParams));
-		}
+		return Cast<UAttributeMenuAWidgetController>(HUD->GetAttributeMenuWidgetController(WCParams));
 	}
 	return nullptr;
 }
 
+USpellMenuWidgetController* UAuraAbilitySystemLibrary::GetSpellMenuWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WCParams;
+	AAuraHUD* HUD = nullptr;
+
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams,HUD))
+	{
+		return Cast<USpellMenuWidgetController>(HUD->GetSpellMenuWidgetController(WCParams));
+	}
+	return nullptr;
+	
+
+}
+
 void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject,
-	ECharacterClass CharacterClass, UAbilitySystemComponent* ASC, float Level)
+                                                            ECharacterClass CharacterClass, UAbilitySystemComponent* ASC, float Level)
 {
 	AActor* AvatarActor = ASC->GetAvatarActor();
 	
@@ -105,10 +132,17 @@ void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext
 
 UCharacterClassInfo* UAuraAbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
 {
-	AAuraGameModeBase* GameMod = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	const AAuraGameModeBase* GameMod = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (GameMod == nullptr)return nullptr;
 	
 	return GameMod->CharacterClassInfo;
+}
+
+UAbilityInfo* UAuraAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	const AAuraGameModeBase* GameMod = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMod == nullptr)return nullptr;
+	return GameMod->AbilityInfo;
 }
 
 bool UAuraAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)

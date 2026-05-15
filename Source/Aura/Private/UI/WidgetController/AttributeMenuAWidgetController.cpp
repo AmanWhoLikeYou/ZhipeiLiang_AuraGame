@@ -11,24 +11,24 @@
 
 void UAttributeMenuAWidgetController::BroadcastInitialValues()
 {
-	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
+
 	check(DA_AttributeInfo);
 	
-	for (auto& Pair : AS->TagsToAttribute)
+	for (auto& Pair : GetAuraAS()->TagsToAttribute)
 	{
 		BroadcastAttributesInfo(Pair.Key, Pair.Value());
 	}
 	
-	OnAttributePointsChangedDelegate.Broadcast(CastChecked<AAuraPlayerState>(PlayerState)->GetAttributePoints());
-	OnSpellPointsChangedDelegate.Broadcast(CastChecked<AAuraPlayerState>(PlayerState)->GetSpellPoints());
+	OnAttributePointsChangedDelegate.Broadcast(GetAuraPS()->GetAttributePoints());
+	OnSpellPointsChangedDelegate.Broadcast(GetAuraPS()->GetSpellPoints());
 }
 
 void UAttributeMenuAWidgetController::BindCallbacksToDependencies()
 {
-	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
+
 	check(DA_AttributeInfo);
 	
-	for (auto& Pair : AS->TagsToAttribute)
+	for (auto& Pair : GetAuraAS()->TagsToAttribute)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
@@ -37,7 +37,7 @@ void UAttributeMenuAWidgetController::BindCallbacksToDependencies()
 		});
 	}
 	
-	AAuraPlayerState* AuraPS = CastChecked<AAuraPlayerState>(PlayerState);
+	AAuraPlayerState* AuraPS = GetAuraPS();
 	AuraPS->OnAttributePointsChangedDelegate.AddLambda([this](const int32 NewAttributePoints)
 	{
 		OnAttributePointsChangedDelegate.Broadcast(NewAttributePoints);
@@ -50,9 +50,10 @@ void UAttributeMenuAWidgetController::BindCallbacksToDependencies()
 
 void UAttributeMenuAWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
-	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+	UAuraAbilitySystemComponent* AuraASC = GetAuraASC();
 	AuraASC->UpgradeAttribute(AttributeTag);
 }
+
 
 void UAttributeMenuAWidgetController::BroadcastAttributesInfo(const FGameplayTag& AttributeTag,
                                                               const FGameplayAttribute& Attribute) const

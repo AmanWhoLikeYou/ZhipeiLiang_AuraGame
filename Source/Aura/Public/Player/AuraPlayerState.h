@@ -28,9 +28,13 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int32 GetPlayerXP() const { return XP; }
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int32 GetAttributePoints() const { return AttributePoints; }
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int32 GetSpellPoints() const { return SpellPoints; }
 	
 	void AddToLevel(int32 AddLevelAmount);
